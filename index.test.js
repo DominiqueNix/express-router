@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('./src/app');
 const { describe, test, expect} = require('@jest/globals');
 const db = require('./db/connection');
-const {User} = require('./models/index')
+const {User, Fruit} = require('./models/index')
 
 describe('user endpoints', () => {
     test('GET /user', async() => {
@@ -32,5 +32,31 @@ describe('user endpoints', () => {
         const response = await request(app).delete('/users/6');
         let deleted =await User.findByPk(6)
         expect(deleted).toBe(null)
+    })
+})
+
+describe('fruits endpoits', ()=> {
+    test('Get all fruits', async() => {
+        const res = await request(app).get('/fruits');
+        expect(res.body == null).toBeFalsy();
+    })
+    test('Get one fruit', async () => {
+        const res = await request(app).get('/fruits/1');
+        expect(res.body.id).toBe(1)
+    })
+    test('Create a fruit', async () => {
+        await request(app).post('/fruits').send({name: "Dragon Fruit", color: "Pink"});
+        const res = await Fruit.findOne({where : {name : "Dragon Fruit"}});
+        expect(res.color).toBe("Pink")
+    })
+    test('Update a fruit', async() => {
+        await request(app).put('/fruits/4').send({color: "Green"});
+        const res = await Fruit.findByPk(4);
+        expect(res.color).toBe("Green")
+    })
+    test('Delete a fruit', async() => {
+        await request(app).delete('/fruits/2');
+        const res = await Fruit.findByPk(2)
+        expect(res).toBe(null)
     })
 })
