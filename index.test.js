@@ -28,10 +28,18 @@ describe('user endpoints', () => {
         expect(updatedUser.age).toBe(28)
     })
     test('DELETE /users/:id', async() => {
-        
         const response = await request(app).delete('/users/6');
         let deleted =await User.findByPk(6)
         expect(deleted).toBe(null)
+    })
+    test('post user validation', async() => {
+        const response = await request(app).post('/users').send({name: "", age: "36"})
+        expect(response.body.error).toEqual([{
+            value: '', 
+            msg: 'Invalid value',
+            param: 'name', 
+            location: 'body'
+        }])
     })
 })
 
@@ -58,5 +66,14 @@ describe('fruits endpoits', ()=> {
         await request(app).delete('/fruits/2');
         const res = await Fruit.findByPk(2)
         expect(res).toBe(null)
+    })
+    test('post fruit validation', async () => {
+        const response = await request(app).post('/fruits').send({name: "Grapefruit", color: ""})
+        expect(response.body.error).toEqual([{
+            value: '', 
+            msg: 'Invalid value',
+            param: 'color', 
+            location: 'body'
+        }])
     })
 })

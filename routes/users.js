@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { User } = require('../models/index')
+const { User } = require('../models/index');
+const { check, validationResult } = require('express-validator')
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -13,9 +14,15 @@ router.get('/:id', async (req,res) => {
     res.json(data)
 })
 // create a new user
-router.post('/', async(req, res) => {
-    let newUser = await User.create(req.body);
-    res.json(newUser)
+router.post('/', [check("name").not().isEmpty().trim()], async(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        res.json({error: errors.array()})
+    } else {
+        let newUser = await User.create(req.body);
+        res.json(newUser)  
+    }
+    
 })
 // update a user
 router.put('/:id', async (req,res) => {

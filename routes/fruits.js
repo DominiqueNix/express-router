@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Fruit } = require('../models/index');
+const { check, validationResult } = require('express-validator');
 
 //get all fruits
 router.get('/', async (req,res) => {
@@ -13,9 +14,15 @@ router.get('/:id', async(req,res) => {
     res.json(data)
 })
 //create a new fruit
-router.post('/', async(req, res) => {
-    const data = await Fruit.create(req.body);
-    res.json(data)
+router.post('/',[check("color").not().isEmpty().trim()] ,async(req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()){
+        res.json({error: errors.array()})
+    }else {
+      const data = await Fruit.create(req.body);
+        res.json(data)  
+    } 
+    
 })
 //update a fruit
 router.put('/:id', async(req,res) => {
