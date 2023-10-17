@@ -14,7 +14,11 @@ router.get('/:id', async(req,res) => {
     res.json(data)
 })
 //create a new fruit
-router.post('/',[check("color").not().isEmpty().trim()] ,async(req, res) => {
+router.post('/',[
+        check("color").not().isEmpty().trim(), 
+        check("name").not().isEmpty().trim(), 
+        check("name").isLength({min: 5, max:20})
+    ] ,async(req, res) => {
     const errors = validationResult(req);
     if(!errors.isEmpty()){
         res.json({error: errors.array()})
@@ -25,9 +29,17 @@ router.post('/',[check("color").not().isEmpty().trim()] ,async(req, res) => {
     
 })
 //update a fruit
-router.put('/:id', async(req,res) => {
-    const data = await Fruit.update(req.body, {where: {id: req.params.id}})
-    res.json(data)
+router.put('/:id',[
+        check("color").not().isEmpty().trim(), 
+        check("name").not().isEmpty().trim()
+    ], async(req,res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            res.json({error: errors.array()})
+        }else {
+            const data = await Fruit.update(req.body, {where: {id: req.params.id}})
+            res.json(data)
+        }
 })
 //delete a fruit
 router.delete('/:id', async(req,res) => {

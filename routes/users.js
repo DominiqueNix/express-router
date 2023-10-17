@@ -14,20 +14,32 @@ router.get('/:id', async (req,res) => {
     res.json(data)
 })
 // create a new user
-router.post('/', [check("name").not().isEmpty().trim()], async(req, res) => {
-    const errors = validationResult(req);
-    if(!errors.isEmpty()) {
-        res.json({error: errors.array()})
-    } else {
-        let newUser = await User.create(req.body);
-        res.json(newUser)  
-    }
+router.post('/', [
+        check("name").not().isEmpty().trim(), 
+        check("age").not().isEmpty().trim(), 
+        check("name").isLength({min: 5, max:15})
+    ], async(req, res) => {
+            const errors = validationResult(req);
+            if(!errors.isEmpty()) {
+                res.json({error: errors.array()})
+            } else {
+                let newUser = await User.create(req.body);
+                res.json(newUser)  
+            }
     
 })
 // update a user
-router.put('/:id', async (req,res) => {
-    let data = await User.update(req.body, {where: {id: req.params.id}});
-    res.json(data)
+router.put('/:id', [
+        check("name").not().isEmpty().trim(), 
+        check("age").not().isEmpty().trim()
+    ],async (req,res) => {
+        const errors = validationResult(req);
+        if(!errors.isEmpty()) {
+            res.json({error: errors.array()})
+        } else {
+            let data = await User.update(req.body, {where: {id: req.params.id}});
+            res.json(data)
+        }
 })
 //delete a user
 router.delete('/:id', async(req, res) => {
